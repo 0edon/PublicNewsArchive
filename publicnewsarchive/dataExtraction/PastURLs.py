@@ -10,6 +10,8 @@ def getPastURLs(year, newspaper_url, startMonth='01', endMonth='12'):
     toDate = f'{year}{endMonth}31235959'
     headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:100.0) Gecko/20100101 Firefox/100.0 "}
     payload = {'versionHistory': versionHistory, 'maxItems': maxItems, 'from': fromDate, 'to': toDate}
+    status = "200"
+    mime ="text/html"
 
     try:
         r = requests.get(url_api, params=payload, headers=headers, timeout=60)
