@@ -28,7 +28,7 @@ Scripts required to extract information from this media outlets can be found in 
 ## Installation
 `Public News Archive` is available through GitHub.
 ```bash
-pip install git+https://github.com/diogocorreia01/PublicNewsArchive
+pip install git+https://github.com/0edon/PublicNewsArchive
 ```
 
 ## Usage (Python)
