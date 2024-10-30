@@ -53,10 +53,15 @@ def getNewsArticles(pastURLs, news_htmlTag, news_htmlClass, links_htmlTag, links
                             print("selinium goes here or maybe add the ones that wont work to a list and then go to the wayback machine isntead of selinium")     
                     except:
                         dictOfFeatures[key] = ' '
-                        
             except:
-                dictOfFeatures[key] = ' '
-                 
+                dictOfFeatures[key] = ' '    
+
+                    
+
+            if link not in ListOfProcessedLinks:
+                ListOfProcessedLinks.append(link)
+                ListOfContents.append(dictOfFeatures)
+
         if debug == True:
             if i != 0 and i % 1 == 0:
                 print(f"\r{100 * i / len(pastURLs):.2f}%", end='')
@@ -69,3 +74,6 @@ def getNewsArticles(pastURLs, news_htmlTag, news_htmlClass, links_htmlTag, links
 
     with open(f'{path + filename}', 'w', encoding='utf-8') as fp:
         json.dump(ListOfContents, fp, indent=4, ensure_ascii=False)
+
+getNewsArticles(pastURLs="https://arquivo.pt/noFrame/replay/20210626061200/https://www.publico.pt/", news_htmlTag='div',
+                 news_htmlClass='card__inner', links_htmlTag='a', links_htmlClass='card__faux-block-link', filename='newsPublico2021.json', debug=True)

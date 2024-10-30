@@ -8,7 +8,11 @@ def getPastURLs(year, newspaper_url, startMonth='01', endMonth='12'):
     maxItems = '5000'
     fromDate = f'{year}{startMonth}01000000'
     toDate = f'{year}{endMonth}31235959'
-    headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:100.0) Gecko/20100101 Firefox/100.0 "}
+    headers = {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36',
+    'Accept-Language': 'pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7',
+    'Referer': 'https://www.google.com'
+}
     payload = {'versionHistory': versionHistory, 'maxItems': maxItems, 'from': fromDate, 'to': toDate,}
     mime ="text/html"
     status = 200
