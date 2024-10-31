@@ -9,7 +9,10 @@ def getNewsArticles(pastURLs, news_htmlTag, news_htmlClass, links_htmlTag, links
     'Accept-Language': 'pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7',
     'Referer': 'https://www.google.com'
 }
-    journalurl = pastURLs[0].rfind('/https')
+    journalurl = pastURLs[0]
+    journalurl_slash_index = pastURLs[0].rfind('/https')
+    journalurl = journalurl[journalurl_slash_index + 1:]
+
 
     dictOfTags = {'Link': [links_htmlTag, links_htmlClass]}
 
@@ -22,6 +25,8 @@ def getNewsArticles(pastURLs, news_htmlTag, news_htmlClass, links_htmlTag, links
         page = requests.get(pastURLs[i])
         soup = BeautifulSoup(page.content, 'html.parser', from_encoding="UTF-8")
         ListOfTagContents = soup.find_all(news_htmlTag, class_=news_htmlClass)
+        print(f"Found {len(ListOfTagContents)} articles on page: {pastURLs[i]}")
+
         for content in ListOfTagContents:
             dictOfFeatures = {}
             dictOfFeatures['JournalURL'] = journalurl
@@ -55,7 +60,6 @@ def getNewsArticles(pastURLs, news_htmlTag, news_htmlClass, links_htmlTag, links
                         else:
                             ListOfProcessedLinks.append(link)
                             ListOfBadContents.append(dictOfFeatures)
-                            print(len(ListOfBadContents)) 
                     except Exception as e:
                         dictOfFeatures[key] = ' '
                         print(f"Error processing link: {link}. Exception: {e}")
@@ -69,6 +73,9 @@ def getNewsArticles(pastURLs, news_htmlTag, news_htmlClass, links_htmlTag, links
                 print(f"\r{100 * i / len(pastURLs):.2f}%", end='')
                 if i == len(pastURLs) - 1:
                     print(f"\r100.00%", end='')
+
+    print(f"Finished processing. Total articles found: {len(ListOfContents)}, Other codes: {len(ListOfTagContents)-len(ListOfContents)-len(ListOfBadContents)}, Bad articles: {len(ListOfBadContents)}")
+
     path = "data/"
     badfilename = "badnewsPublico2021.json"
 
