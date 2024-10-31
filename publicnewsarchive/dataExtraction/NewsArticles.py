@@ -9,10 +9,12 @@ def getNewsArticles(pastURLs, news_htmlTag, news_htmlClass, links_htmlTag, links
     'Accept-Language': 'pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7',
     'Referer': 'https://www.google.com'
 }
-    
-    dictOfTags = {'Link': [links_htmlTag, links_htmlClass],}
+    journalurl = pastURLs[0].rfind('/https')
+
+    dictOfTags = {'Link': [links_htmlTag, links_htmlClass]}
 
     ListOfContents = []
+    ListOfBadContents = []
     ListOfProcessedLinks = []
 
 
@@ -22,6 +24,7 @@ def getNewsArticles(pastURLs, news_htmlTag, news_htmlClass, links_htmlTag, links
         ListOfTagContents = soup.find_all(news_htmlTag, class_=news_htmlClass)
         for content in ListOfTagContents:
             dictOfFeatures = {}
+            dictOfFeatures['JournalURL'] = journalurl
             for key in dictOfTags:
                 try:
                     if key == "Link":
@@ -50,12 +53,16 @@ def getNewsArticles(pastURLs, news_htmlTag, news_htmlClass, links_htmlTag, links
                             ListOfProcessedLinks.append(link)
                             ListOfContents.append(dictOfFeatures)
                         else:
-                            print("selinium goes here or maybe add the ones that wont work to a list and then go to the wayback machine isntead of selinium")     
-                    except:
+                            ListOfProcessedLinks.append(link)
+                            ListOfBadContents.append(dictOfFeatures)
+                            print(len(ListOfBadContents)) 
+                    except Exception as e:
                         dictOfFeatures[key] = ' '
-                        
-            except:
-                dictOfFeatures[key] = ' '
+                        print(f"Error processing link: {link}. Exception: {e}")
+    
+            except Exception as e:
+                    dictOfFeatures[key] = ' '
+                    print(f"Error processing link: {link}. Exception: {e}")
                  
         if debug == True:
             if i != 0 and i % 1 == 0:
@@ -63,9 +70,15 @@ def getNewsArticles(pastURLs, news_htmlTag, news_htmlClass, links_htmlTag, links
                 if i == len(pastURLs) - 1:
                     print(f"\r100.00%", end='')
     path = "data/"
+    badfilename = "badnewsPublico2021.json"
 
     if not os.path.exists(path):
         os.makedirs(path)
 
     with open(f'{path + filename}', 'w', encoding='utf-8') as fp:
         json.dump(ListOfContents, fp, indent=4, ensure_ascii=False)
+    
+    with open(f'{path + badfilename}', 'w', encoding='utf-8') as fp:
+        json.dump(ListOfBadContents, fp, indent=4, ensure_ascii=False)   
+
+    
