@@ -6,7 +6,7 @@ def getPastURLs(year, newspaper_url, startMonth='01', endMonth='12'):
     url_api = 'https://arquivo.pt/textsearch'
 
     versionHistory = newspaper_url
-    maxItems = '5000'
+    maxItems = 5000
     fromDate = f'{year}{startMonth}01000000'
     toDate = f'{year}{endMonth}31235959'
     headers = {
@@ -16,7 +16,7 @@ def getPastURLs(year, newspaper_url, startMonth='01', endMonth='12'):
     }
     payload = {
         'versionHistory': versionHistory,
-        'maxItems': maxItems,
+        'maxItems': str(maxItems),
         'from': fromDate,
         'to': toDate,
     }
@@ -24,7 +24,7 @@ def getPastURLs(year, newspaper_url, startMonth='01', endMonth='12'):
     status = 200
 
     try:
-        r = requests.get(url_api, params=payload, headers=headers, timeout=120)
+        r = requests.get(url_api, params=payload, headers=headers, timeout=600)
     except Timeout:
         print(f'Timeout has been raised, status code: N/A')
         return []
@@ -39,19 +39,22 @@ def getPastURLs(year, newspaper_url, startMonth='01', endMonth='12'):
             if item['statusCode'] == status and item['mimeType'] == mime:
                 pastURLs.append(item['linkToNoFrame'])
             else:
-                print("Skipped one due to status or mime type")
                 skippedItems.append(item)  # Store the skipped item
         else:
-            print("Skipped one due to missing statusCode or mimeType")
             skippedItems.append(item)  # Store the skipped item
 
     print(f"Finished processing. Total URLs found: {len(pastURLs)}, Estimated URLs: {content.get('estimated_nr_results', 'N/A')}")
 
+    # Save past URLs to a JSON file
+    path = "data/"
+    past_urls_filename = f'past_urls_{year}.json'
+    with open(f'{path + past_urls_filename}', 'w', encoding='utf-8') as fp:
+        json.dump(pastURLs, fp, ensure_ascii=False, indent=4)
+
     # Save skipped items to a JSON file
     if skippedItems:
-        path = "data/"
         skipped_filename = f'skipped_items_{year}.json'
         with open(f'{path + skipped_filename}', 'w', encoding='utf-8') as fp:
-            json.dump(skippedItems, fp, indent=4, ensure_ascii=False)
+            json.dump(skippedItems, fp, ensure_ascii=False, indent=4)
 
-    return list(set(pastURLs))
+    return pastURLs

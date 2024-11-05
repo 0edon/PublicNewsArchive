@@ -23,13 +23,11 @@ setup(
     include_package_data=True,
     install_requires=[
         'beautifulsoup4',
-        'date-guesser-rc @ git+https://github.com/rncampos/date_guesser',
         'geopy',
         'gmplot',
         'matplotlib',
         'numpy',
         'pandas',
-        'pt-core-news-lg @ https://github.com/explosion/spacy-models/releases/download/pt_core_news_lg-3.8.0/pt_core_news_lg-3.8.0-py3-none-any.whl',
         'requests',
         'spacy',
         'urllib3',

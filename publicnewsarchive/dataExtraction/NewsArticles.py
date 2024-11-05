@@ -62,11 +62,11 @@ def getNewsArticles(pastURLs, news_htmlTag, news_htmlClass, links_htmlTag, links
                             ListOfBadContents.append(dictOfFeatures)
                     except Exception as e:
                         dictOfFeatures[key] = ' '
-                        print(f"Error processing link: {link}. Exception: {e}")
+                        # print(f"Error processing link: {link}. Exception: {e}")
     
             except Exception as e:
                     dictOfFeatures[key] = ' '
-                    print(f"Error processing link: {link}. Exception: {e}")
+                    # print(f"Error processing link: {link}. Exception: {e}")
                  
         if debug == True:
             if i != 0 and i % 1 == 0:
@@ -74,7 +74,7 @@ def getNewsArticles(pastURLs, news_htmlTag, news_htmlClass, links_htmlTag, links
                 if i == len(pastURLs) - 1:
                     print(f"\r100.00%", end='')
 
-    print(f"Finished processing. Total articles found: {len(ListOfContents)}, Other codes: {len(ListOfTagContents)-len(ListOfContents)-len(ListOfBadContents)}, Bad articles: {len(ListOfBadContents)}")
+    print(f"Finished processing. Total articles found: {len(ListOfContents)}, Bad articles: {len(ListOfBadContents)}")
 
     path = "data/"
     badfilename = "badnewsPublico2021.json"
