@@ -30,26 +30,35 @@ def getPastURLs(year, newspaper_url, startMonth='01', endMonth='12'):
         return []
 
     content = r.json()
-    pastURLs = []
+    pastURLs = {}
     skippedItems = []  # List to store skipped items
 
     for item in content.get('response_items', []):
         # Check for the existence of statusCode and mimeType before accessing
         if 'statusCode' in item and 'mimeType' in item:
             if item['statusCode'] == status and item['mimeType'] == mime:
-                pastURLs.append(item['linkToNoFrame'])
+                # Extract date portion from the timestamp in the URL
+                url = item['linkToNoFrame']
+                date = url.split('/replay/')[1][:8]  # Get YYYYMMDD
+
+                # Add only the first occurrence of each date
+                if date not in pastURLs:
+                    pastURLs[date] = url
             else:
                 skippedItems.append(item)  # Store the skipped item
         else:
             skippedItems.append(item)  # Store the skipped item
 
-    print(f"Finished processing. Total URLs found: {len(pastURLs)}, Estimated URLs: {content.get('estimated_nr_results', 'N/A')}")
+    print(f"Finished processing. Total unique dates found: {len(pastURLs)}, Estimated URLs: {content.get('estimated_nr_results', 'N/A')}")
 
-    # Save past URLs to a JSON file
+    # Convert the dictionary values to a list to keep only one URL per date
+    unique_pastURLs = list(pastURLs.values())
+
+    # Save unique past URLs to a JSON file
     path = "data/"
     past_urls_filename = f'past_urls_{year}.json'
     with open(f'{path + past_urls_filename}', 'w', encoding='utf-8') as fp:
-        json.dump(pastURLs, fp, ensure_ascii=False, indent=4)
+        json.dump(unique_pastURLs, fp, ensure_ascii=False, indent=4)
 
     # Save skipped items to a JSON file
     if skippedItems:
@@ -57,4 +66,4 @@ def getPastURLs(year, newspaper_url, startMonth='01', endMonth='12'):
         with open(f'{path + skipped_filename}', 'w', encoding='utf-8') as fp:
             json.dump(skippedItems, fp, ensure_ascii=False, indent=4)
 
-    return pastURLs
+    return unique_pastURLs

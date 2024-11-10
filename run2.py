@@ -2,7 +2,7 @@ from newspaper import Article
 import json
 
 # Step 1: Read the JSON file
-with open('C:/Users/Tese/Vscode/PublicNewsArchive/data/newsPublico2022.json', 'r', encoding='utf-8') as file:
+with open('C:/Users/Tese/Vscode/PublicNewsArchive/data/news2022.json', 'r', encoding='utf-8') as file:
     data = json.load(file)
 
 # Step 2: Extract the links

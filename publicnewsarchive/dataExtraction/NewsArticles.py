@@ -88,4 +88,78 @@ def getNewsArticles(pastURLs, news_htmlTag, news_htmlClass, links_htmlTag, links
     with open(f'{path + badfilename}', 'w', encoding='utf-8') as fp:
         json.dump(ListOfBadContents, fp, indent=4, ensure_ascii=False)   
 
+
+def getNewsArticles2(pastURLs, role_value, links_htmlTag, links_htmlClass, filename, debug=False):
+    
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36',
+        'Accept-Language': 'pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7',
+        'Referer': 'https://www.google.com'
+    }
+    journalurl = pastURLs[0]
+    journalurl_slash_index = pastURLs[0].rfind('/https')
+    journalurl = journalurl[journalurl_slash_index + 1:]
+
+    dictOfTags = {'Link': [links_htmlTag, links_htmlClass]}
+
+    ListOfContents = []
+    ListOfBadContents = []
+    ListOfProcessedLinks = []
+
+    for i in range(len(pastURLs)):
+        try:
+            page = requests.get(pastURLs[i], headers=headers, timeout=10)
+            soup = BeautifulSoup(page.content, 'html.parser', from_encoding="UTF-8")
+            
+            # Find elements by role attribute
+            ListOfTagContents = soup.find_all(attrs={"role": role_value})
+            print(f"Found {len(ListOfTagContents)} articles on page: {pastURLs[i]}")
+
+            for content in ListOfTagContents:
+                dictOfFeatures = {}
+                dictOfFeatures['JournalURL'] = journalurl
+                for key in dictOfTags:
+                    try:
+                        if key == "Link":
+                            link = content.find(dictOfTags[key][0], class_=dictOfTags[key][1]).get("href").strip()
+                            if link.startswith('/noFrame/replay/'):
+                                link = link.replace('/noFrame/replay/', 'https://arquivo.pt/noFrame/replay/')
+                            dictOfFeatures[key] = link
+                        else:
+                            dictOfFeatures[key] = content.find(dictOfTags[key][0], class_=dictOfTags[key][1]).get_text().strip()
+                    except Exception as e:
+                        print(f"Error processing tag: {key}. Exception: {e}")
+                        ListOfBadContents.append(content)
+                ListOfContents.append(dictOfFeatures)
+            ListOfProcessedLinks.append(pastURLs[i])
+        except requests.exceptions.Timeout:
+            print(f"Timeout occurred for URL: {pastURLs[i]}")
+            ListOfBadContents.append(pastURLs[i])
+        except Exception as e:
+            print(f"Error processing link: {pastURLs[i]}. Exception: {e}")
+            ListOfBadContents.append(pastURLs[i])
+                 
+        if debug:
+            if i != 0 and i % 1 == 0:
+                print(f"\r{100 * i / len(pastURLs):.2f}%", end='')
+                if i == len(pastURLs) - 1:
+                    print(f"\r100.00%", end='')
+
+    print(f"Finished processing. Total articles found: {len(ListOfContents)}, Other codes: {len(ListOfTagContents)-len(ListOfContents)-len(ListOfBadContents)}, Bad articles: {len(ListOfBadContents)}")
+
+    path = "data/"
+    badfilename = "badnewsPublico2021.json"
+    processed_links_filename = "processed_links.json"
+
+    if not os.path.exists(path):
+        os.makedirs(path)
+
+    with open(f'{path + filename}', 'w', encoding='utf-8') as fp:
+        json.dump(ListOfContents, fp, indent=4, ensure_ascii=False)
+    
+    with open(f'{path + badfilename}', 'w', encoding='utf-8') as fp:
+        json.dump(ListOfBadContents, fp, indent=4, ensure_ascii=False)
+    
+    with open(f'{path + processed_links_filename}', 'w', encoding='utf-8') as fp:
+        json.dump(ListOfProcessedLinks, fp, indent=4, ensure_ascii=False)
     
