@@ -1,8 +1,11 @@
 import requests
 import json
 from requests.exceptions import Timeout
+import time
 
 def getPastURLs(year, newspaper_url, startMonth='01', endMonth='12'):
+    
+    start = time.time()
     url_api = 'https://arquivo.pt/textsearch'
 
     versionHistory = newspaper_url
@@ -48,8 +51,10 @@ def getPastURLs(year, newspaper_url, startMonth='01', endMonth='12'):
                 skippedItems.append(item)  # Store the skipped item
         else:
             skippedItems.append(item)  # Store the skipped item
-
-    print(f"Finished processing. Total unique dates found: {len(pastURLs)}, Estimated URLs: {content.get('estimated_nr_results', 'N/A')}")
+    
+    end = time.time()
+    
+    print(f"Finished processing. Total unique dates found: {len(pastURLs)}, Estimated URLs: {content.get('estimated_nr_results', 'N/A')}, Time elapsed: {end - start:.2f} seconds")
 
     # Convert the dictionary values to a list to keep only one URL per date
     unique_pastURLs = list(pastURLs.values())

@@ -10,8 +10,13 @@ links = [item['Link'] for item in data]
 
 articles_data = []
 
+proxies = {
+    'http': 'http://8.211.42.167:3128',
+    'https': 'https://3.127.62.252:80'
+}
+
 for link in links:
-    article = Article(link)  # Initialize with the URL
+    article = Article(link, proxies=proxies)  # Initialize with the URL
     article.download()       # Download the article content
     article.parse()          # Parse the downloaded content
 
